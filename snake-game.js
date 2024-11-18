@@ -13,6 +13,7 @@ function snakegame() {
   let lastSnakeColor = "#33cc33";
   let colorChangeTimer = 0;
   let score = 0;
+  let devMode = false;
 
   const mushroomImage = new Image();
   mushroomImage.src = "mushroom.png";
@@ -30,12 +31,12 @@ function snakegame() {
     { background: "#000000", snake: "rainbow" }, // Level 7
     { background: "pulse", snake: "#FF1493" }, // Level 8
     { background: "#4B0082", snake: "strobe" }, // Level 9
-    { background: "rainbow", snake: "rainbow" }, // Level 10
-    { background: "spiral", snake: "rainbow" }, // Level 11
-    { background: "vortex", snake: "rainbow" }, // Level 12
-    { background: "matrix", snake: "glitch" }, // Level 13
-    { background: "fractal", snake: "plasma" }, // Level 14
-    { background: "chaos", snake: "chaos" }, // Level 15
+    { background: "#001F3F", snake: "#7FDBFF" }, // Level 10 - Deep Navy with Cyan
+    { background: "#004D40", snake: "#1DE9B6" }, // Level 11 - Teal with Mint
+    { background: "#311B92", snake: "#B388FF" }, // Level 12 - Deep Purple with Light Purple
+    { background: "#006064", snake: "#84FFFF" }, // Level 13 - Cyan Dark with Bright Cyan
+    { background: "#1A237E", snake: "#536DFE" }, // Level 14 - Indigo with Electric Blue
+    { background: "#263238", snake: "#90A4AE" }, // Level 15 - Blue Grey with Light Blue Grey
     { background: "plasma", snake: "neon" }, // Level 16
     { background: "tunnel", snake: "trail" }, // Level 17
     { background: "ripple", snake: "ghost" }, // Level 18
@@ -311,6 +312,136 @@ function snakegame() {
     ctx.restore();
   }
 
+  function applyEffectLevel12(ctx) {
+    // Digital wave effect
+    const time = Date.now() / 1000;
+    ctx.save();
+
+    // Create digital-looking waves
+    for (let i = 0; i < canvas.width; i += 10) {
+      const height = Math.sin(time + i * 0.05) * 20;
+      ctx.fillStyle = `rgba(0, 255, 0, 0.1)`;
+      ctx.fillRect(i, canvas.height / 2 + height, 8, canvas.height / 2);
+      ctx.fillRect(i, 0, 8, canvas.height / 2 + height - 20);
+    }
+
+    ctx.globalAlpha = 0.8;
+    drawGameElements(ctx);
+    ctx.restore();
+  }
+
+  function applyEffectLevel13(ctx) {
+    // Geometric mandala effect
+    const time = Date.now() / 1000;
+    ctx.save();
+
+    // Create rotating geometric patterns
+    for (let i = 0; i < 8; i++) {
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(time + (i * Math.PI) / 4);
+
+      // Draw geometric shapes
+      ctx.beginPath();
+      ctx.moveTo(-50, -50);
+      ctx.lineTo(50, -50);
+      ctx.lineTo(0, 50);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(0, 255, 255, 0.1)`;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 0.8;
+    drawGameElements(ctx);
+    ctx.restore();
+  }
+
+  function applyEffectLevel14(ctx) {
+    // Neon pulse rings
+    const time = Date.now() / 1000;
+    ctx.save();
+
+    // Create expanding rings
+    for (let i = 0; i < 5; i++) {
+      const radius = (time * 50 + i * 50) % 200;
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(${time * 50 + i * 30}, 100%, 50%, ${
+        0.3 - radius / 600
+      })`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 0.8;
+    drawGameElements(ctx);
+    ctx.restore();
+  }
+
+  function applyEffectLevel15(ctx) {
+    // Prismatic shatter effect
+    ctx.save();
+    const time = Date.now() / 1000;
+
+    // Create prismatic fragments
+    for (let i = 0; i < 12; i++) {
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((i * Math.PI) / 6 + time);
+
+      // Draw prismatic shards
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(100, 30);
+      ctx.lineTo(100, -30);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${i * 30}, 70%, 50%, 0.1)`;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 0.8;
+    drawGameElements(ctx);
+    ctx.restore();
+  }
+
+  function applyEffectLevel20(ctx) {
+    // Void effect with black hole distortion
+    ctx.save();
+    const time = Date.now() / 1000;
+
+    // Create void effect
+    const gradient = ctx.createRadialGradient(
+      canvas.width / 2,
+      canvas.height / 2,
+      0,
+      canvas.width / 2,
+      canvas.height / 2,
+      canvas.width
+    );
+    gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
+    gradient.addColorStop(0.7, "rgba(75, 0, 130, 0.5)");
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0.8)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add swirling effect
+    for (let i = 0; i < 5; i++) {
+      ctx.save();
+      ctx.globalAlpha = 0.1;
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(time * (i + 1) * 0.5);
+      ctx.scale(1 - i * 0.1, 1 - i * 0.1);
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      drawGameElements(ctx);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
   function drawGameElements(ctx) {
     // Draw snake
     const currentScheme = colorSchemes[effectLevel];
@@ -367,10 +498,15 @@ function snakegame() {
     if (effectLevel >= 9) applyEffectLevel9(ctx);
     if (effectLevel >= 10) applyEffectLevel10(ctx);
     if (effectLevel >= 11) applyEffectLevel11(ctx);
+    if (effectLevel >= 12) applyEffectLevel12(ctx);
+    if (effectLevel >= 13) applyEffectLevel13(ctx);
+    if (effectLevel >= 14) applyEffectLevel14(ctx);
+    if (effectLevel >= 15) applyEffectLevel15(ctx);
     if (effectLevel >= 16) applyEffectLevel16(ctx);
     if (effectLevel >= 17) applyEffectLevel17(ctx);
     if (effectLevel >= 18) applyEffectLevel18(ctx);
     if (effectLevel >= 19) applyEffectLevel19(ctx);
+    if (effectLevel >= 20) applyEffectLevel20(ctx);
 
     // Update shake intensity
     if (effectLevel >= 8) {
@@ -452,14 +588,53 @@ function snakegame() {
     setTimeout(gameLoop, 100);
   }
 
+  function handleDevControls(event) {
+    // Toggle dev mode with 'D' key
+    if (event.key === "d" || event.key === "D") {
+      devMode = !devMode;
+      console.log(`Dev mode: ${devMode ? "ON" : "OFF"}`);
+      toggleDevInstructions(devMode);
+      return;
+    }
+
+    // Only process if dev mode is on
+    if (devMode) {
+      let level = null;
+
+      // Handle number keys (0-9) for levels 0-9
+      if (event.key >= "0" && event.key <= "9") {
+        level = parseInt(event.key);
+      }
+      // Handle letters for levels 10-20
+      else if (event.key === "q") level = 10;
+      else if (event.key === "w") level = 11;
+      else if (event.key === "e") level = 12;
+      else if (event.key === "r") level = 13;
+      else if (event.key === "t") level = 14;
+      else if (event.key === "y") level = 15;
+      else if (event.key === "u") level = 16;
+      else if (event.key === "i") level = 17;
+      else if (event.key === "o") level = 18;
+      else if (event.key === "p") level = 19;
+      else if (event.key === "a") level = 20;
+
+      // Set the level if it's valid
+      if (level !== null && level <= 20) {
+        effectLevel = level;
+        console.log(`Switched to level ${level}`);
+        updateScoreDisplay();
+      }
+    }
+  }
+
+  document.addEventListener("keydown", handleDevControls);
+
   function updateScoreDisplay() {
-    // Update score
     document.getElementById("scoreValue").textContent = score;
+    document.getElementById("levelValue").textContent = `${effectLevel}${
+      devMode ? " (DEV)" : ""
+    }`;
 
-    // Update level
-    document.getElementById("levelValue").textContent = effectLevel;
-
-    // Update high score
     const highScore = localStorage.getItem("highScore") || 0;
     if (score > highScore) {
       localStorage.setItem("highScore", score);
@@ -468,6 +643,13 @@ function snakegame() {
       highScore,
       score
     );
+  }
+
+  function toggleDevInstructions(show) {
+    const instructions = document.getElementById("devInstructions");
+    if (instructions) {
+      instructions.style.display = show ? "block" : "none";
+    }
   }
 
   initGame();
