@@ -1,7 +1,7 @@
 function snakegame() {
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
-  const gridSize = 40;
+  const gridSize = 35;
   let snake, mushroom, direction, mushroomsEaten, gameOver;
   let effectLevel = 0;
   let currentHue = 0;
