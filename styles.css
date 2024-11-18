@@ -8,6 +8,9 @@ body {
     margin: 0;
     overflow: hidden;
     color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .game-container {
@@ -16,21 +19,27 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    max-width: 800px;
 }
 
 .score-board {
     display: flex;
     justify-content: space-around;
-    width: 600px;
+    width: 100%;
+    max-width: 600px;
     padding: 15px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     backdrop-filter: blur(5px);
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .score-item {
     text-align: center;
+    padding: 5px;
 }
 
 .score-label {
@@ -52,12 +61,15 @@ h1 {
     color: white;
     text-shadow: 2px 2px 4px red;
     margin-bottom: 30px;
+    text-align: center;
 }
 
 #gameCanvas {
     border: 5px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    height: auto;
 }
 
 #restartButton {
@@ -89,4 +101,42 @@ h1 {
     border-radius: 5px;
     margin-top: 10px;
     font-family: monospace;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Touch Controls Styles */
+.touch-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.touch-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 24px;
+    touch-action: manipulation;
+}
+
+.touch-button:active {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Media Queries for Mobile Devices */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
 }

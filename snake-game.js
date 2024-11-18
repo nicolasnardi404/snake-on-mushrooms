@@ -1,7 +1,28 @@
 function snakegame() {
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
-  const gridSize = 35;
+
+  // Adjust grid size based on device
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  const gridSize = isMobile ? 25 : 35; // Smaller grid for mobile
+
+  // Adjust canvas size for mobile
+  function resizeCanvas() {
+    const maxWidth = isMobile ? window.innerWidth - 20 : 800;
+    const maxHeight = isMobile ? window.innerHeight * 0.6 : 600;
+
+    // Make canvas size divisible by grid size
+    canvas.width = Math.floor(maxWidth / gridSize) * gridSize;
+    canvas.height = Math.floor(maxHeight / gridSize) * gridSize;
+  }
+
+  // Call resize on init
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
   let snake, mushroom, direction, mushroomsEaten, gameOver;
   let effectLevel = 0;
   let currentHue = 0;
@@ -14,6 +35,7 @@ function snakegame() {
   let colorChangeTimer = 0;
   let score = 0;
   let devMode = false;
+  let touchControls;
 
   const mushroomImage = new Image();
   mushroomImage.src = "mushroom.png";
@@ -54,6 +76,62 @@ function snakegame() {
     glitchMushrooms = [];
     score = 0;
     updateScoreDisplay();
+
+    if (!touchControls && isMobile) {
+      createTouchControls();
+    }
+  }
+
+  function createTouchControls() {
+    touchControls = document.createElement("div");
+    touchControls.className = "touch-controls";
+
+    // Create touch control buttons in a grid layout
+    const buttons = [
+      { direction: "up", symbol: "↑", gridArea: "1 / 2 / 2 / 3" },
+      { direction: "left", symbol: "←", gridArea: "2 / 1 / 3 / 2" },
+      { direction: "right", symbol: "→", gridArea: "2 / 3 / 3 / 4" },
+      { direction: "down", symbol: "↓", gridArea: "3 / 2 / 4 / 3" },
+    ];
+
+    buttons.forEach(({ direction, symbol, gridArea }) => {
+      const button = document.createElement("button");
+      button.textContent = symbol;
+      button.className = `touch-button ${direction}`;
+      button.style.gridArea = gridArea;
+
+      // Add both touch and click handlers for better response
+      const handleInput = (e) => {
+        e.preventDefault();
+        handleTouchControl(direction);
+      };
+
+      button.addEventListener("touchstart", handleInput);
+      button.addEventListener("mousedown", handleInput);
+      touchControls.appendChild(button);
+    });
+
+    document.body.appendChild(touchControls);
+
+    // Only show touch controls on mobile devices
+    touchControls.style.display = isMobile ? "grid" : "none";
+  }
+
+  function handleTouchControl(dir) {
+    switch (dir) {
+      case "left":
+        if (direction.x === 0) direction = { x: -1, y: 0 };
+        break;
+      case "up":
+        if (direction.y === 0) direction = { x: 0, y: -1 };
+        break;
+      case "right":
+        if (direction.x === 0) direction = { x: 1, y: 0 };
+        break;
+      case "down":
+        if (direction.y === 0) direction = { x: 0, y: 1 };
+        break;
+    }
   }
 
   function applyEffectLevel1(ctx) {
@@ -467,6 +545,10 @@ function snakegame() {
 
   function draw() {
     if (gameOver) {
+      // Adjust font sizes for mobile
+      const gameOverFontSize = isMobile ? "32px" : "48px";
+      const scoreFontSize = isMobile ? "18px" : "24px";
+
       // Create gradient background for game over screen
       const gradient = ctx.createLinearGradient(
         0,
@@ -487,13 +569,13 @@ function snakegame() {
 
       // Main "GAME OVER" text
       ctx.fillStyle = "#ff6f61";
-      ctx.font = '48px "Press Start 2P", cursive';
+      ctx.font = `${gameOverFontSize} "Press Start 2P", cursive`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
 
       // Final score display
-      ctx.font = '24px "Press Start 2P", cursive';
+      ctx.font = `${scoreFontSize} "Press Start 2P", cursive`;
       ctx.fillStyle = "#ffffff";
       ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 40);
 
@@ -615,7 +697,8 @@ function snakegame() {
   function gameLoop() {
     update();
     draw();
-    setTimeout(gameLoop, 100);
+    // Slower speed on mobile for better control
+    setTimeout(gameLoop, isMobile ? 150 : 100);
   }
 
   function handleDevControls(event) {
@@ -660,19 +743,22 @@ function snakegame() {
   document.addEventListener("keydown", handleDevControls);
 
   function updateScoreDisplay() {
-    document.getElementById("scoreValue").textContent = score;
-    document.getElementById("levelValue").textContent = `${effectLevel}${
-      devMode ? " (DEV)" : ""
-    }`;
+    const scoreElement = document.getElementById("scoreValue");
+    const levelElement = document.getElementById("levelValue");
+    const highScoreElement = document.getElementById("highScoreValue");
+
+    if (scoreElement) scoreElement.textContent = score;
+    if (levelElement) {
+      levelElement.textContent = `${effectLevel}${devMode ? " (DEV)" : ""}`;
+    }
 
     const highScore = localStorage.getItem("highScore") || 0;
     if (score > highScore) {
       localStorage.setItem("highScore", score);
     }
-    document.getElementById("highScoreValue").textContent = Math.max(
-      highScore,
-      score
-    );
+    if (highScoreElement) {
+      highScoreElement.textContent = Math.max(highScore, score);
+    }
   }
 
   function toggleDevInstructions(show) {
