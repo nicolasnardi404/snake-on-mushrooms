@@ -467,9 +467,39 @@ function snakegame() {
 
   function draw() {
     if (gameOver) {
+      // Create gradient background for game over screen
+      const gradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+      gradient.addColorStop(0, "#1a0f3c");
+      gradient.addColorStop(1, "#4b0082");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Set up text shadow for glow effect
+      ctx.shadowColor = "#ff0000";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Main "GAME OVER" text
       ctx.fillStyle = "#ff6f61";
-      ctx.font = "48px Press Start 2P";
-      ctx.fillText("Game Over", canvas.width / 4, canvas.height / 2);
+      ctx.font = '48px "Press Start 2P", cursive';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+
+      // Final score display
+      ctx.font = '24px "Press Start 2P", cursive';
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 40);
+
+      // Reset shadow properties
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = "transparent";
       return;
     }
 
