@@ -12,6 +12,7 @@ function snakegame() {
   let lastBackgroundColor = "#000000";
   let lastSnakeColor = "#33cc33";
   let colorChangeTimer = 0;
+  let score = 0;
 
   const mushroomImage = new Image();
   mushroomImage.src = "mushroom.png";
@@ -45,6 +46,8 @@ function snakegame() {
     effectLevel = 0;
     gameOver = false;
     glitchMushrooms = [];
+    score = 0;
+    updateScoreDisplay();
   }
 
   function applyEffectLevel1(ctx) {
@@ -292,7 +295,13 @@ function snakegame() {
         y: Math.floor((Math.random() * canvas.height) / gridSize),
       };
       mushroomsEaten++;
+
+      // Calculate score bonus based on current level
+      const levelBonus = Math.floor(effectLevel / 2) * 5;
+      score += 10 + levelBonus; // Base 10 points + bonus for higher levels
+
       effectLevel = Math.min(15, Math.floor(mushroomsEaten / 2));
+      updateScoreDisplay();
     } else {
       snake.pop();
     }
@@ -326,6 +335,20 @@ function snakegame() {
     update();
     draw();
     setTimeout(gameLoop, 100);
+  }
+
+  function updateScoreDisplay() {
+    document.getElementById("scoreValue").textContent = score;
+
+    // Update high score
+    const highScore = localStorage.getItem("highScore") || 0;
+    if (score > highScore) {
+      localStorage.setItem("highScore", score);
+    }
+    document.getElementById("highScoreValue").textContent = Math.max(
+      highScore,
+      score
+    );
   }
 
   initGame();
