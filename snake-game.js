@@ -36,6 +36,11 @@ function snakegame() {
     { background: "matrix", snake: "glitch" }, // Level 13
     { background: "fractal", snake: "plasma" }, // Level 14
     { background: "chaos", snake: "chaos" }, // Level 15
+    { background: "plasma", snake: "neon" }, // Level 16
+    { background: "tunnel", snake: "trail" }, // Level 17
+    { background: "ripple", snake: "ghost" }, // Level 18
+    { background: "nebula", snake: "starlight" }, // Level 19
+    { background: "void", snake: "quantum" }, // Level 20
   ];
 
   function initGame() {
@@ -200,6 +205,112 @@ function snakegame() {
     }
   }
 
+  function applyEffectLevel16(ctx) {
+    // Plasma wave effect with intense screen shake
+    const time = Date.now() / 1000;
+    const shakeX = Math.random() * 15 - 7.5;
+    const shakeY = Math.random() * 15 - 7.5;
+
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
+    // Create plasma waves
+    for (let i = 0; i < canvas.width; i += 20) {
+      for (let j = 0; j < canvas.height; j += 20) {
+        const hue = (time * 50 + i * 0.5 + j * 0.5) % 360;
+        ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.2)`;
+        const size = 20 + Math.sin(time + i * 0.1) * 10;
+        ctx.fillRect(i, j, size, size);
+      }
+    }
+
+    drawGameElements(ctx);
+    ctx.restore();
+  }
+
+  function applyEffectLevel17(ctx) {
+    // 3D tunnel effect with trailing copies
+    const copies = 5;
+    const time = Date.now() / 1000;
+
+    ctx.save();
+    for (let i = 0; i < copies; i++) {
+      const scale = 1 + i * 0.2;
+      const alpha = 1 - i * 0.2;
+      const rotation = time + (i * Math.PI) / 8;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(rotation);
+      ctx.scale(scale, scale);
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      drawGameElements(ctx);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function applyEffectLevel18(ctx) {
+    // Ripple distortion with ghost trails
+    const time = Date.now() / 1000;
+
+    // Create ripple effect
+    ctx.save();
+    for (let i = 0; i < canvas.height; i += 2) {
+      const offset = Math.sin(time * 2 + i * 0.03) * 15;
+      ctx.drawImage(canvas, 0, i, canvas.width, 2, offset, i, canvas.width, 2);
+    }
+
+    // Add ghost trails
+    for (let i = 0; i < 3; i++) {
+      ctx.globalAlpha = 0.2;
+      ctx.translate(Math.sin(time + i) * 10, Math.cos(time + i) * 10);
+      drawGameElements(ctx);
+    }
+    ctx.restore();
+  }
+
+  function applyEffectLevel19(ctx) {
+    // Nebula effect with starlight particles
+    ctx.save();
+
+    // Create nebula background
+    const gradient = ctx.createRadialGradient(
+      canvas.width / 2,
+      canvas.height / 2,
+      0,
+      canvas.width / 2,
+      canvas.height / 2,
+      canvas.width
+    );
+
+    const time = Date.now() / 1000;
+    gradient.addColorStop(0, `hsla(${(time * 50) % 360}, 100%, 50%, 0.2)`);
+    gradient.addColorStop(
+      0.5,
+      `hsla(${(time * 50 + 120) % 360}, 100%, 50%, 0.2)`
+    );
+    gradient.addColorStop(
+      1,
+      `hsla(${(time * 50 + 240) % 360}, 100%, 50%, 0.2)`
+    );
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add starlight particles
+    for (let i = 0; i < 50; i++) {
+      const x = (Math.sin(time * i) * canvas.width) / 2 + canvas.width / 2;
+      const y = (Math.cos(time * i) * canvas.height) / 2 + canvas.height / 2;
+      const size = Math.random() * 3;
+
+      ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()})`;
+      ctx.fillRect(x, y, size, size);
+    }
+    ctx.restore();
+  }
+
   function drawGameElements(ctx) {
     // Draw snake
     const currentScheme = colorSchemes[effectLevel];
@@ -256,6 +367,10 @@ function snakegame() {
     if (effectLevel >= 9) applyEffectLevel9(ctx);
     if (effectLevel >= 10) applyEffectLevel10(ctx);
     if (effectLevel >= 11) applyEffectLevel11(ctx);
+    if (effectLevel >= 16) applyEffectLevel16(ctx);
+    if (effectLevel >= 17) applyEffectLevel17(ctx);
+    if (effectLevel >= 18) applyEffectLevel18(ctx);
+    if (effectLevel >= 19) applyEffectLevel19(ctx);
 
     // Update shake intensity
     if (effectLevel >= 8) {
@@ -300,7 +415,7 @@ function snakegame() {
       const levelBonus = Math.floor(effectLevel / 2) * 5;
       score += 10 + levelBonus; // Base 10 points + bonus for higher levels
 
-      effectLevel = Math.min(15, Math.floor(mushroomsEaten / 2));
+      effectLevel = Math.min(20, Math.floor(mushroomsEaten / 2));
       updateScoreDisplay();
     } else {
       snake.pop();
@@ -338,7 +453,11 @@ function snakegame() {
   }
 
   function updateScoreDisplay() {
+    // Update score
     document.getElementById("scoreValue").textContent = score;
+
+    // Update level
+    document.getElementById("levelValue").textContent = effectLevel;
 
     // Update high score
     const highScore = localStorage.getItem("highScore") || 0;
